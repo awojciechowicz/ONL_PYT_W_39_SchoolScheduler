@@ -1,0 +1,25 @@
+<p>
+  School classes:
+  {% for school_class in school_classes %}
+      <a href="{% url 'school-class-schedule' school_class.id %}">{{ school_class.name }}</a>
+  {% endfor %}
+</p>
+<p>
+  Teachers:
+  {% for teacher in teachers %}
+      <a href="{% url 'teacher-schedule' teacher.id %}">{{ teacher }}</a>
+  {% endfor %}
+
+</p>
+<p>
+  Daily schedule for school classes:
+  {% for weekday in weekdays %}
+      <a href="{% url 'day-school-class-schedule' weekday.id %}">{{ weekday }}</a>
+  {% endfor %}
+</p>
+<p>
+  Daily schedule for teachers:
+  {% for weekday in weekdays %}
+      <a href="{% url 'day-teacher-schedule' weekday.id %}">{{ weekday }}</a>
+  {% endfor %}
+</p>

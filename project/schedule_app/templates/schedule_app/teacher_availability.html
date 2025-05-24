@@ -1,0 +1,28 @@
+{% extends 'schedule_app/base.html' %}
+{% block content %}
+    <h1>{{ teacher }}</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Lessons time</th>
+                {% for weekday in weekdays %}
+                    <th>{{ weekday }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for time_slot in time_slots %}
+                <tr class='row'>
+                    <td>{{ time_slot }}</td>
+                    {% for avail in availability %}
+                        {% if avail.time_slot == time_slot %}
+                            <td style="background-color:{{ avail.color }}"></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <a href="{% url 'teacher-availability_edit' teacher.id %}"><b>Edit availability</b></a>
+{% endblock %}

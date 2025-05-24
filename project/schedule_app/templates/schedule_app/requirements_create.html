@@ -1,0 +1,17 @@
+{% extends 'schedule_app/base.html' %}
+{% block content %}
+    <h1>Requirements for {{ school_class.name }}</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        <ul>
+            {% for teach_subj in teacher_subjects %}
+                <li>
+                    <input type="hidden" name="teacher_subject_ids" value="{{ teach_subj.id }}">
+                    <input type="number" name="hours_{{ teach_subj.id }}" min="0" step="1">
+                    hours {{ teach_subj }} weekly
+                </li>
+            {% endfor %}
+        </ul>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'schedule_app/base.html' %}
+{% block content %}
+    <h1>{{ teacher }}</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Lessons time</th>
+                {% for weekday in weekdays %}
+                    <th>{{ weekday }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for time_slot in time_slots %}
+                <tr>
+                    <td>{{ time_slot }}</td>
+                    {% for lesson in lessons %}
+                        {% if lesson.schedule_slot.time_slot == time_slot %}
+                            <td style="text-align: center; background-color:{{ lesson.color }}">
+                                <b>{{ lesson.teacher_subject.subject.name }}</b> <br>
+                                {{ lesson.school_class.name }}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% include 'schedule_app/schedules.html' %}
+{% endblock %}

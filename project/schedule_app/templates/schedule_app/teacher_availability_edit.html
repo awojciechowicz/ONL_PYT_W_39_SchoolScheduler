@@ -1,0 +1,33 @@
+{% extends 'schedule_app/base.html' %}
+{% block content %}
+  <form action="" method="post">
+        {% csrf_token %}
+    <h1>{{ teacher }}</h1>
+      <table border="1">
+          <thead>
+              <tr>
+                  <th>Lessons time</th>
+                  {% for weekday in weekdays %}
+                      <th>{{ weekday }}</th>
+                  {% endfor %}
+              </tr>
+          </thead>
+          <tbody>
+              {% for time_slot in time_slots %}
+                  <tr>
+                      <td>{{ time_slot }}</td>
+                      {% for avail in availability %}
+                          {% if avail.time_slot == time_slot %}
+                              <td align="center" style="background-color:{{ avail.color }}">
+                                <input type="checkbox" name="avail_{{ avail.weekday }}_{{ avail.time_slot }}" checked>
+                              </td>
+                          {% endif %}
+                      {% endfor %}
+                  </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+    <br>
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}

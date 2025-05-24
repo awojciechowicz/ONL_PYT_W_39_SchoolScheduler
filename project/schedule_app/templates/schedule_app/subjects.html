@@ -1,0 +1,17 @@
+{% extends 'schedule_app/base.html' %}
+{% block content %}
+    <h1>Subjects</h1>
+    <a href="{% url 'subject-create' %}">Add subject</a>
+    <ol>
+        {% for subject in subjects %}
+            <li>
+                {{ subject }}
+                <ul>
+                    {% for teacher in subject.teachers.all %}
+                        <li>{{ teacher }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ol>
+{% endblock %}

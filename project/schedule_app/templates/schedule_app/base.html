@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scheduler</title>
+</head>
+<body>
+    <a href="{% url 'teachers' %}">Teachers</a>
+    <a href="{% url 'teachers-avail' %}">Teachers availability</a>
+    <a href="{% url 'subjects' %}">Subjects</a>
+    <a href="{% url 'school_classes' %}">School classes</a>
+    <a href="{% url 'schedule' %}">Generate schedule</a>
+    <a href="{% url 'schedules' %}">All schedules</a>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>

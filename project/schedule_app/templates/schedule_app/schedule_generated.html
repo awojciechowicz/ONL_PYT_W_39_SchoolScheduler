@@ -1,0 +1,10 @@
+{% extends 'schedule_app/base.html' %}
+{% block content %}
+    <h3>The schedule has been successfully generated!</h3>
+    <ul>
+        <li>class conflicts: {{ conflicts }}</li>
+        <li>teacher availability conflicts: {{ availability }}</li>
+        <li>schedule consistency: {{ result }}</li>
+    </ul>
+    {% include 'schedule_app/schedules.html' %}
+{% endblock %}

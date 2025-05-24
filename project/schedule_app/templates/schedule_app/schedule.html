@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scheduler</title>
+</head>
+<body>
+<!--    <table border="1">-->
+<!--        <thead>-->
+<!--            <tr>-->
+<!--                <th>Lessons time</th>-->
+<!--                {% for weekday in weekdays %}-->
+<!--                    <th>{{ weekday }}</th>-->
+<!--                {% endfor %}-->
+<!--            </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--            {% for time_slot in time_slots %}-->
+<!--                <tr>-->
+<!--                    <td>{{ time_slot }}</td>-->
+<!--                    {% for sched in schedule %}-->
+<!--                        {% if sched.lessons_time.time_slot == time_slot %}-->
+<!--                            <td style="text-align: center;">-->
+<!--                                <b>{{ sched.teacher_subject.subject }}</b> <br>-->
+<!--                                {{ sched.teacher_subject.teacher }}-->
+<!--                            </td>-->
+<!--                        {% endif %}-->
+<!--                    {% endfor %}-->
+<!--                </tr>-->
+<!--            {% endfor %}-->
+<!--        </tbody>-->
+<!--    </table>-->
+<!--    <ul>-->
+<!--        {% for teach_avail in temp %}-->
+<!--            <li>-->
+<!--                {{ teach_avail }} <br>-->
+<!--                {{ sched.school_class }} <br>-->
+<!--                {{ sched.teacher_subject.teacher }} <br>-->
+<!--                {{ sched.teacher_subject.subject }} <br>-->
+<!--                {{ sched.school_class }} <br>-->
+<!--                {{ sched.lessons_time }}-->
+<!--            </li>-->
+<!--        {% endfor %}-->
+<!--        <li>{{ teachers_availability }}</li>-->
+<!---->
+<!--    </ul>-->
+
+    {% for req0 in schedule %}
+        <p>_________________________</p>
+        <ol>
+            {% for req1 in req0 %}
+                {% for req2 in req1 %}
+                    {% if req2 != None %}
+                        <li>{{ req2 }}</li>
+                    {% else %}
+                        <li>_________________________</li>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </ol>
+    {% endfor %}
+<!--    <ol>-->
+<!--    {% for teach_avail in temp %}-->
+<!--        <li>{{ teach_avail }}</li>-->
+<!--    {% endfor %}-->
+<!--    </ol>-->
+
+<!--    <ul>-->
+<!--        {% for req0 in schedule %}-->
+<!--            {% for req1 in req0 %}-->
+<!--                {% for req2 in req1 %}-->
+<!--                    <li>{{ req2 }}</li>-->
+<!--                {% endfor %}-->
+<!--            {% endfor %}-->
+<!--        {% endfor %}-->
+<!--    </ul>-->
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Lessons time</th>
+                {% for weekday in weekdays %}
+                    <th>{{ weekday }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for time_slot in time_slots %}
+                <tr class='row'>
+                    <td>{{ time_slot }}</td>
+                    {% for req0 in schedule %}
+                        {% for req1 in req0 %}
+                            {% for req2 in req1 %}
+                                <td>
+                                    {{ req2.weekday }} <br>
+                                    {{ req2.time_slot }} <br>
+                                    {{ req2.school_class }} <br>
+                                </td>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

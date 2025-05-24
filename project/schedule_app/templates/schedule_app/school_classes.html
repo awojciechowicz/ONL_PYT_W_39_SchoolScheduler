@@ -1,0 +1,12 @@
+{% extends 'schedule_app/base.html' %}
+{% block content %}
+    <h1>School classes</h1>
+    <a href="{% url 'school-class-create' %}">Add school class</a>
+    <ul>
+        {% for school_class in school_classes %}
+            <li>
+                <a href="{% url 'school_class' school_class.id %}">{{ school_class.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

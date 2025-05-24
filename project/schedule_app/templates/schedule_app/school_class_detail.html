@@ -1,0 +1,15 @@
+{% extends 'schedule_app/base.html' %}
+{% block content %}
+
+    <h1>{{ school_class }}</h1>
+    <ul>
+        {% for subject in subjects %}
+            <li>
+                {{ subject.lessons_required }} hours
+                {{ subject.teacher_subject.subject }} with
+                {{ subject.teacher_subject.teacher }} weekly
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'requirements-create' school_class.id %}"><b>Create or edit requirements</b></a>
+{% endblock %}

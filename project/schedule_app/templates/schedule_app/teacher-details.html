@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>{{ teacher }}</h1>
+    <ul>
+        {% for subject in teacher.subject.all %}
+            <li>
+                {{ subject }}
+            </li>
+        {% endfor %}
+    </ul>
+    <table border="1">
+        <thead>
+            <tr>
+                <td>Lessons time</td>
+                {% for weekday in availability %}
+                    <td>{{ weekday.get_day_display }}</td>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for lesson in lessons %}
+                <tr>
+                    <td>{{ lesson }}</td>
+                    {% for weekday in availability %}
+                        <td>{{ weekday.get_day_display }}</td>
+
+                        {% for teach_avail in teacher.available.all %}
+
+
+                            {% for less in teach_avail.lesson.all %}
+                                {% if lesson == less and teach_avail.day == weekday.day %}
+
+                                {% endif %}
+                            {% empty %}
+                                <td></td>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h1>{{ teacher }}</h1>
+    <ul>
+        {% for avail in availability %}
+            <li>
+                {{ avail.get_day_display }}
+                <ul>
+                    {% for less in avail.lesson.all %}
+                        <li>{{ less }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+<!--    <ul>-->
+<!--        {% for teach_avail in teacher.available.all %}-->
+<!--            <li>-->
+<!--                {{ teach_avail }}-->
+<!--            </li>-->
+<!--        {% endfor %}-->
+<!--    </ul>-->
+</body>
+</html>
