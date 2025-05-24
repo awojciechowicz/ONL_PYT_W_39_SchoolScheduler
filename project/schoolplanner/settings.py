@@ -75,15 +75,6 @@ WSGI_APPLICATION = 'schoolplanner.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'HOST': '127.0.0.1',
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'python_module5',
-#         'USER': 'postgres',
-#         'PASSWORD': 'coderslab',
-#     }
-# }
 
 DATABASES = {
     'default': {
