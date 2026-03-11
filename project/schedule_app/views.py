@@ -1,14 +1,13 @@
 import random
-from calendar import weekday
 
 import numpy as np
 from deap import creator, base, tools, algorithms
-import random
 from django.shortcuts import render, redirect
 from django.views import View
 
 from .forms import (SubjectCreateForm,
-                    SchoolClassCreateForm, TeacherCreateForm)
+                    SchoolClassCreateForm,
+                    TeacherCreateForm)
 from .models import (Weekday,
                      TimeSlot,
                      ScheduleSlot,
@@ -17,9 +16,8 @@ from .models import (Weekday,
                      Subject,
                      SchoolClass,
                      Requirements,
-                     Lessons, TeacherSubject)
-
-
+                     Lessons,
+                     TeacherSubject)
 
 
 # Create your views here.
@@ -34,6 +32,7 @@ class TeachersView(View):
             'schedule_app/teachers.html',
             context
         )
+
 
 class TeacherDetailsView(View):
     def get(self, request, *args, **kwargs):
@@ -70,6 +69,7 @@ class TeacherDetailsView(View):
             context
         )
 
+
 class TeachersAvailabilityView(View):
     def get(self, request, *args, **kwargs):
         teachers_availability = TeacherAvailability.objects.all()
@@ -95,6 +95,7 @@ class TeachersAvailabilityView(View):
             context
         )
 
+
 class SubjectsView(View):
     def get(self, request, *args, **kwargs):
         subjects = Subject.objects.all()
@@ -106,6 +107,7 @@ class SubjectsView(View):
             'schedule_app/subjects.html',
             context
         )
+
 
 class SchoolClassesView(View):
     def get(self, request, *args, **kwargs):
@@ -119,6 +121,7 @@ class SchoolClassesView(View):
             'schedule_app/school_classes.html',
             context
         )
+
 
 class SchoolClassDetailView(View):
     def get(self, request, *args, **kwargs):
@@ -134,9 +137,11 @@ class SchoolClassDetailView(View):
             context
         )
 
+
 class GenerateScheduleView(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'schedule_app/generate_schedule.html')
+
     def post(self, request, *args, **kwargs):
         requirements = Requirements.objects.all()
         schedule_slots = ScheduleSlot.objects.all().order_by('time_slot', 'weekday')
@@ -147,7 +152,6 @@ class GenerateScheduleView(View):
         teacher_subjects = TeacherSubject.objects.all()
         teachers = Teacher.objects.all()
         schedule_old = Lessons.objects.all().delete()
-
 
         # teachers_subject = []
         lessons = []
@@ -162,14 +166,12 @@ class GenerateScheduleView(View):
         temp = []
         for schedule_slot in schedule_slots:
             temp.append([teach_avail.teacher_id
-                        for teach_avail
-                        in teachers_availability.filter(availability=schedule_slot)])
+                         for teach_avail
+                         in teachers_availability.filter(availability=schedule_slot)])
         teach_avail = np.ndarray((time_slots.count(), weekdays.count()), dtype=list)
         for i in range(weekdays.count()):
             for j in range(time_slots.count()):
                 teach_avail[j, i] = temp[i + weekdays.count() * j]
-
-
 
         def genetic_alg():
             creator.create("FitnessMulti", base.Fitness, weights=(1.0, 1.0, 1.0,))
@@ -199,6 +201,7 @@ class GenerateScheduleView(View):
                             else:
                                 arr[i, j, k] = None
                             index += 1
+                print('Wymiary: ', arr.shape[0], ', ', arr.shape[1], ', ', arr.shape[2])
                 individual = creator.Individual(arr)
                 return individual
 
@@ -250,7 +253,8 @@ class GenerateScheduleView(View):
                                     if individual[i, j, l]['subj'] == individual[i, k, l]['subj']:
                                         result -= 1
                                         # result -= 0
-                # print('Result: ', collision, availability, result)
+                if (collision == 0 or availability == 0):
+                    print('Result: ', collision, availability, result)
 
                 return (collision, availability, result,)
 
@@ -264,40 +268,102 @@ class GenerateScheduleView(View):
                 return ind1_copy, ind2_copy
 
             def mutShuffle2D(individual, indpb):
-                for i in range(individual.shape[0]):
-                    for row in range(individual.shape[1]):
-                        if random.random() < indpb:
-                            pos1 = random.randint(0, individual.shape[2] - 1)
-                            pos2 = random.randint(0, individual.shape[2] - 1)
-                            individual[i, row, pos1], individual[i, row, pos2] = \
-                                individual[i, row, pos2], individual[i, row, pos1]
-                    for col in range(individual.shape[2]):
-                        if random.random() < indpb:
-                            pos1 = random.randint(0, individual.shape[1] - 1)
-                            # while individual[i, pos1, col] is None and individual[i, pos1 - 1, col] is None:
-                            #     pos1 = random.randint(0, individual.shape[1] - 1)
-                            #     print("POS1: ", pos1)
-                            #     print(individual[i, pos1, col])
-                            pos2 = random.randint(0, individual.shape[1] - 1)
-                            # while individual[i, pos2, col] is None and individual[i, pos2 - 1, col] is None:
-                            #     pos2 = random.randint(0, individual.shape[1] - 1)
-                            #     print("POS2: ", pos2)
-                            #     print(individual[i, pos2, col])
-                            individual[i, pos1, col], individual[i, pos2, col] = \
-                                individual[i, pos2, col], individual[i, pos1, col]
+                i = random.randint(0, individual.shape[0] - 1)
+                if random.random() < indpb:
+                    row_pos1 = random.randint(0, individual.shape[1] - 1)
+                    row_pos2 = random.randint(0, individual.shape[1] - 1)
+                    col_pos1 = random.randint(0, individual.shape[2] - 1)
+                    col_pos2 = random.randint(0, individual.shape[2] - 1)
+                    if individual[i, row_pos1, col_pos1] is None and individual[i, row_pos2, col_pos2] is None:
+                        if row_pos1 == 0:
+                            while individual[i, row_pos1, col_pos1] is None:
+                                row_pos1 += 1
+                        else:
+                            while individual[i, row_pos1, col_pos1] is None:
+                                row_pos1 -= 1
+                        if row_pos2 == 0:
+                            while individual[i, row_pos2, col_pos2] is None:
+                                row_pos2 += 1
+                        else:
+                            while individual[i, row_pos2, col_pos2] is None:
+                                row_pos2 -= 1
+                    elif individual[i, row_pos1, col_pos1] is not None and individual[i, row_pos2, col_pos2] is None:
+                        if row_pos2 == 0:
+                            while individual[i, row_pos2, col_pos2] is None:
+                                row_pos2 += 1
+                        else:
+                            while individual[i, row_pos2, col_pos2] is None:
+                                row_pos2 -= 1
+                    elif individual[i, row_pos1, col_pos1] is None and individual[i, row_pos2, col_pos2] is not None:
+                        if row_pos1 == 0:
+                            while individual[i, row_pos1, col_pos1] is None:
+                                row_pos1 += 1
+                        else:
+                            while individual[i, row_pos1, col_pos1] is None:
+                                row_pos1 -= 1
+                    individual[i, row_pos1, col_pos1], individual[i, row_pos2, col_pos2] = \
+                        individual[i, row_pos2, col_pos2], individual[i, row_pos1, col_pos1]
+                if random.random() < indpb / 4:
+                    row_pos1 = 0
+                    col_pos = random.randint(0, individual.shape[2] - 1)
+                    while individual[i, row_pos1, col_pos] is None:
+                        row_pos1 += 1
+                    row_pos2 = individual.shape[1] - 1
+                    while individual[i, row_pos2 - 1, col_pos] is None:
+                        row_pos2 -= 1
+                    if row_pos1 == 2:
+                        row_pos2 -= 1
+                        print('tutaj')
+                    individual[i, row_pos1, col_pos], individual[i, row_pos2, col_pos] = \
+                        individual[i, row_pos2, col_pos], individual[i, row_pos1, col_pos]
+
+                # for i in range(individual.shape[0]):
+                #     for row in range(individual.shape[1]):
+                #         if random.random() < indpb:
+                #             pos1 = random.randint(0, individual.shape[2] - 1)
+                #             if pos1 == individual.shape[2] - 1:
+                #                 pos2 = 0
+                #             else:
+                #                 pos2 = pos1 + 1
+                #             # pos2 = random.randint(0, individual.shape[2] - 1)
+                #             if (individual[i, row, pos1] is not None and individual[i, row, pos2] is not None)\
+                #                     or (individual[i, row, pos1] is not None and individual[i, row, pos2] is None)\
+                #                     or (individual[i, row, pos1] is None and individual[i, row, pos2] is not None):
+                #                 individual[i, row, pos1], individual[i, row, pos2] = \
+                #                     individual[i, row, pos2], individual[i, row, pos1]
+                #     for col in range(individual.shape[2]):
+                #         if random.random() < indpb:
+                #             pos1 = random.randint(0, individual.shape[1] - 1)
+                #             print('IND21: ', individual[i, pos1, col])
+                #             while individual[i, pos1, col] is None:
+                #                 pos1 = random.randint(0, individual.shape[1] - 1)
+                #                 print("POS1: ", pos1)
+                #             if individual[i, pos1 + 1, col] is None:
+                #                 pos2 = 0
+                #             else:
+                #                 pos2 = pos1 + 1
+                #                 # print(individual[i, pos1, col])
+                #         pos2 = random.randint(0, individual.shape[1] - 1)
+                #         print('IND22: ', individual[i, pos2, col])
+                #         # while individual[i, pos2, col] is None and individual[i, pos2 - 1, col] is None:
+                #         #     pos2 = random.randint(0, individual.shape[1] - 1)
+                #         #     print("POS2: ", pos2)
+                #         #     print(individual[i, pos2, col])
+                #         individual[i, pos1, col], individual[i, pos2, col] = \
+                #             individual[i, pos2, col], individual[i, pos1, col]
                 return individual,
 
             toolbox = base.Toolbox()
             toolbox.register("individual", random_individual)
             toolbox.register("population", tools.initRepeat, list, toolbox.individual)
             toolbox.register("mate", cxTwoPoint3D)
-            toolbox.register("mutate", mutShuffle2D, indpb=0.3)
+            toolbox.register("mutate", mutShuffle2D, indpb=0.2)
             toolbox.register("evaluate", evalSchedule)
-            toolbox.register("select", tools.selTournament, tournsize=10)
+            toolbox.register("select", tools.selTournament, tournsize=50)
             # toolbox.register("select", tools.selNSGA2)
 
-            population = toolbox.population(n=200)
-            algorithms.eaSimple(population, toolbox, cxpb=0.2, mutpb=0.35, ngen=500)
+            population = toolbox.population(n=500)
+            algorithms.eaSimple(population, toolbox, cxpb=0.1, mutpb=0.45, ngen=900, verbose=False)
             best_individual = tools.selBest(population, k=1)[0]
             fitness_values = best_individual.fitness.values
             print('Last fitness: ', fitness_values)
@@ -312,7 +378,8 @@ class GenerateScheduleView(View):
                     teacher_gen = schedule[i, j // weekdays.count(), j % weekdays.count()]['teach']
                     subject_gen = schedule[i, j // weekdays.count(), j % weekdays.count()]['subj']
                     teacher_subject_gen = teacher_subjects.get(teacher_id=teacher_gen, subject_id=subject_gen)
-                    schedule_slot_gen = schedule_slots.get(weekday=schedule_slot.weekday, time_slot=schedule_slot.time_slot)
+                    schedule_slot_gen = schedule_slots.get(weekday=schedule_slot.weekday,
+                                                           time_slot=schedule_slot.time_slot)
                     Lessons.objects.create(
                         school_class_id=school_class_gen,
                         teacher_subject_id=teacher_subject_gen.id,
@@ -320,14 +387,15 @@ class GenerateScheduleView(View):
                     )
 
         context = {
-            'conflicts': int(abs(fitness[0]/100)),
-            'availability': int(abs(fitness[1]/10)),
-            'result': fitness[2],
+            'conflicts': int(abs(fitness[0] / 100)),
+            'availability': int(abs(fitness[1] / 10)),
+            'result': int(fitness[2]),
             'school_classes': school_classes,
             'weekdays': weekdays,
             'teachers': teachers,
         }
         return render(request, 'schedule_app/schedule_generated.html', context)
+
 
 class SubjectCreateView(View):
     def get(self, request, *args, **kwargs):
@@ -344,20 +412,21 @@ class SubjectCreateView(View):
     def post(self, request, *args, **kwargs):
         form = SubjectCreateForm(request.POST)
         context = {
-           'form': form,
+            'form': form,
         }
         if form.is_valid():
-           name = form.cleaned_data['name']
-           subject = Subject.objects.create(
-               name=name,
-           )
-           return redirect('subjects')
+            name = form.cleaned_data['name']
+            subject = Subject.objects.create(
+                name=name,
+            )
+            return redirect('subjects')
         else:
-           return render(
-               request,
-               'schedule_app/subject_create.html',
-               context
-           )
+            return render(
+                request,
+                'schedule_app/subject_create.html',
+                context
+            )
+
 
 class SchoolClassCreateView(View):
     def get(self, request, *args, **kwargs):
@@ -370,6 +439,7 @@ class SchoolClassCreateView(View):
             'schedule_app/school_class_create.html',
             context
         )
+
     def post(self, request, *args, **kwargs):
         form = SchoolClassCreateForm(request.POST)
         context = {
@@ -388,6 +458,7 @@ class SchoolClassCreateView(View):
                 context
             )
 
+
 class RequirementsCreateView(View):
     def get(self, request, *args, **kwargs):
         school_class = SchoolClass.objects.get(pk=kwargs['school_class_id'])
@@ -403,6 +474,7 @@ class RequirementsCreateView(View):
             'schedule_app/requirements_create.html',
             context
         )
+
     def post(self, request, *args, **kwargs):
         school_class = SchoolClass.objects.get(pk=kwargs['school_class_id'])
         teacher_subject_ids = request.POST.getlist('teacher_subject_ids')
@@ -424,6 +496,7 @@ class RequirementsCreateView(View):
                 Requirements.objects.filter(school_class=school_class, teacher_subject=teacher_subject).delete()
         return redirect('school_class', school_class_id=school_class.id)
 
+
 class TeacherCreateView(View):
     def get(self, request, *args, **kwargs):
         form = TeacherCreateForm()
@@ -435,6 +508,7 @@ class TeacherCreateView(View):
             'schedule_app/teacher_create.html',
             context
         )
+
     def post(self, request, *args, **kwargs):
         form = TeacherCreateForm(request.POST)
         context = {
@@ -459,6 +533,7 @@ class TeacherCreateView(View):
                 'schedule_app/teacher_create.html',
                 context
             )
+
 
 class TeacherAvailabilityEditView(View):
     def get(self, request, *args, **kwargs):
@@ -493,6 +568,7 @@ class TeacherAvailabilityEditView(View):
             'schedule_app/teacher_availability_edit.html',
             context
         )
+
     def post(self, request, *args, **kwargs):
         teacher = Teacher.objects.get(pk=kwargs['teacher_id'])
         weekdays = Weekday.objects.all()
@@ -508,6 +584,7 @@ class TeacherAvailabilityEditView(View):
                     if TeacherAvailability.objects.filter(teacher=teacher, availability=schedule_slot).exists():
                         TeacherAvailability.objects.get(teacher=teacher, availability=schedule_slot).delete()
         return redirect('teacher', teacher_id=teacher.id)
+
 
 class ScheduleSchoolClassView(View):
     def get(self, request, *args, **kwargs):
@@ -546,6 +623,7 @@ class ScheduleSchoolClassView(View):
             'schedule_app/school_class_schedule.html',
             context
         )
+
 
 class ScheduleTeacherView(View):
     def get(self, request, *args, **kwargs):
@@ -608,11 +686,13 @@ class ScheduleTeacherView(View):
             context
         )
 
+
 class ScheduleDaySchoolClassView(View):
     def get(self, request, *args, **kwargs):
         weekday = Weekday.objects.get(pk=kwargs['weekday_id'])
         weekdays = Weekday.objects.all()
-        lessons = Lessons.objects.filter(lessons_time__weekday=weekday).order_by('lessons_time__time_slot', 'school_class')
+        lessons = Lessons.objects.filter(lessons_time__weekday=weekday).order_by('lessons_time__time_slot',
+                                                                                 'school_class')
         school_classes = SchoolClass.objects.all()
         teachers = Teacher.objects.all()
         time_slots = TimeSlot.objects.all()
@@ -646,13 +726,15 @@ class ScheduleDaySchoolClassView(View):
             context
         )
 
+
 class ScheduleDayTeacherView(View):
     def get(self, request, *args, **kwargs):
         weekday = Weekday.objects.get(pk=kwargs['weekday_id'])
         weekdays = Weekday.objects.all()
-        lessons = Lessons.objects.filter(lessons_time__weekday=weekday).order_by('lessons_time__time_slot', 'teacher_subject__teacher_id')
-        for lesson in lessons:
-            print(lesson.teacher_subject.teacher, lesson.teacher_subject.subject, lesson.lessons_time.time_slot, lesson.lessons_time.weekday, lesson.school_class)
+        lessons = Lessons.objects.filter(lessons_time__weekday=weekday).order_by('lessons_time__time_slot',
+                                                                                 'teacher_subject__teacher_id')
+        # for lesson in lessons:
+        #     print(lesson.teacher_subject.teacher, lesson.teacher_subject.subject, lesson.lessons_time.time_slot, lesson.lessons_time.weekday, lesson.school_class)
         teachers = Teacher.objects.all()
         school_classes = SchoolClass.objects.all()
         time_slots = TimeSlot.objects.all()
@@ -687,6 +769,7 @@ class ScheduleDayTeacherView(View):
             context
         )
 
+
 class SchedulesView(View):
     def get(self, request, *args, **kwargs):
         school_classes = SchoolClass.objects.all()
@@ -700,5 +783,40 @@ class SchedulesView(View):
         return render(
             request,
             'schedule_app/schedules_template.html',
+            context
+        )
+
+
+class TestView(View):
+    def get(self, request, *args, **kwargs):
+        teacher_availabilities = TeacherAvailability.objects.all()
+        lessons = Lessons.objects.all()
+        schedule_slots = ScheduleSlot.objects.all().order_by('time_slot', 'weekday')
+        weekdays = Weekday.objects.all()
+        time_slots = TimeSlot.objects.all()
+        teach_avail = []
+        for schedule_slot in schedule_slots:
+            if teacher_availabilities.filter(availability=schedule_slot).exists():
+                teach_avail.append(
+                    {
+                        'weekday': schedule_slot.weekday,
+                        'time_slot': schedule_slot.time_slot,
+                        'teachers': [teach.teacher
+                                     for teach
+                                     in teacher_availabilities.filter(availability=schedule_slot).order_by(
+                                'teacher__last_name')
+                                     if not (lessons.filter(lessons_time=schedule_slot,
+                                                            teacher_subject__teacher=teach.teacher).exists())
+                                     ],
+                    }
+                )
+        context = {
+            'teacher_availabilities': teach_avail,
+            'weekdays': weekdays,
+            'time_slots': time_slots,
+        }
+        return render(
+            request,
+            'schedule_app/test.html',
             context
         )
