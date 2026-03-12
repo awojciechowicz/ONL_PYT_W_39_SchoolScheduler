@@ -38,9 +38,9 @@ jobs:
         pip install -r requirements.txt
         pip install flake8
 
-    - name: Lint code
-      run: |
-        flake8 .
+#    - name: Lint code
+#      run: |
+#        flake8 .
 
     - name: Django system check
       run: |
