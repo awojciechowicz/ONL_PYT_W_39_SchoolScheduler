@@ -1,0 +1,15 @@
+# Ignoruj pliki IDE
+.idea/
+
+# Ignoruj bazę danych SQLite w podkatalogu .project
+.project/db.sqlite3
+
+# Ignoruj dane wrażliwe
+.project/.env
+
+# Ignoruj cache Pythona w całym projekcie
+**/__pycache__/
+
+# Ignoruj wszystkie pliki migracji (opcja: zostaw __init__.py jeśli potrzebne)
+.project/schedule_app/migrations/*.py
+!.project/schedule_app/migrations/__init__.py
