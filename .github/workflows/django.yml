@@ -42,3 +42,7 @@ jobs:
     - name: Run tests
       run: |
         pytest -vvv
+
+    - name: Django check
+      run: |
+        python manage.py check
