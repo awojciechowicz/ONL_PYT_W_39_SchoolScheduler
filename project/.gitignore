@@ -1,5 +1,5 @@
 # Ignoruj pliki IDE
-../.idea/
+../../../.idea/
 
 # Ignoruj bazę danych SQLite w podkatalogu .project
 db.sqlite3
