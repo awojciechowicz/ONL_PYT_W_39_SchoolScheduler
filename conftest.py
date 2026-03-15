@@ -1,8 +1,10 @@
 import datetime
 import pytest
+from faker import Faker
 
 from schedule_app.models import Subject, Teacher, TimeSlot
 
+fake = Faker('en_GB')
 
 @pytest.fixture
 def subject():
@@ -15,6 +17,18 @@ def teacher():
         last_name="Test teacher surname",
         email="Test teacher email"
     )
+
+@pytest.fixture
+def teachers():
+    teachers = []
+    for _ in range(10):
+        teacher=Teacher.objects.create(
+            first_name=fake.first_name(),
+            last_name=fake.last_name(),
+            email=fake.email(),
+        )
+        teachers.append(teacher)
+    return teachers
 
 @pytest.fixture
 def timeslot():
