@@ -151,7 +151,7 @@ class GenerateScheduleView(View):
         school_classes = SchoolClass.objects.all()
         teacher_subjects = TeacherSubject.objects.all()
         teachers = Teacher.objects.all()
-        schedule_old = Lessons.objects.all().delete()
+        Lessons.objects.all().delete()
 
         # teachers_subject = []
         lessons = []
@@ -357,13 +357,13 @@ class GenerateScheduleView(View):
             toolbox.register("individual", random_individual)
             toolbox.register("population", tools.initRepeat, list, toolbox.individual)
             toolbox.register("mate", cxTwoPoint3D)
-            toolbox.register("mutate", mutShuffle2D, indpb=0.1)
+            toolbox.register("mutate", mutShuffle2D, indpb=0.8)
             toolbox.register("evaluate", evalSchedule)
-            toolbox.register("select", tools.selTournament, tournsize=15)
+            toolbox.register("select", tools.selTournament, tournsize=2)
             # toolbox.register("select", tools.selNSGA2)
 
             population = toolbox.population(n=1000)
-            algorithms.eaSimple(population, toolbox, cxpb=0.1, mutpb=0.2, ngen=900, verbose=False)
+            algorithms.eaSimple(population, toolbox, cxpb=0.9, mutpb=0.9, ngen=200, verbose=False)
             best_individual = tools.selBest(population, k=1)[0]
             fitness_values = best_individual.fitness.values
             print('Last fitness: ', fitness_values)
