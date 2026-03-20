@@ -30,7 +30,10 @@ class TeachersView(View):
         for teacher in teachers:
             num_requirements = Requirements.objects.filter(teacher_subject__teacher=teacher).count()
             num_availability = TeacherAvailability.objects.filter(teacher=teacher).count()
-            priority = num_availability/num_requirements
+            if num_requirements != 0:
+                priority = num_availability/num_requirements
+            else:
+                priority = 0
             if priority < 1:
                 teacher.availability_priority = 0
             elif priority < 2:

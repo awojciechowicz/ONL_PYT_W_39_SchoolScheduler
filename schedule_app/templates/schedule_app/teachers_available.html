@@ -1,6 +1,6 @@
 {% extends 'schedule_app/base.html' %}
 {% block content %}
-    <h1>Weekly teachers' availability</h1>
+    <h1>Weekly teachers' availability heatmap</h1>
     <table border="1">
         <thead>
             <tr>
@@ -18,15 +18,15 @@
                             {% for teach_avail in teachers_availability %}
                                 {% if teach_avail.weekday == weekday and teach_avail.time_slot == time_slot %}
                                     {% if teach_avail.teachers == 0 %}
-                                        <td style="background-color:#d73027"></td>
+                                        <td style="background-color:#d73027">{{ teach_avail.teachers }}</td>
                                     {% elif teach_avail.teachers <= 15 %}
-                                        <td style="background-color:#fc8d59"></td>
+                                        <td style="background-color:#fc8d59">{{ teach_avail.teachers }}</td>
                                     {% elif teach_avail.teachers <= 30 %}
-                                        <td style="background-color:#fee08b"></td>
+                                        <td style="background-color:#fee08b">{{ teach_avail.teachers }}</td>
                                     {% elif teach_avail.teachers <= 60 %}
-                                        <td style="background-color:#91cf60"></td>
+                                        <td style="background-color:#91cf60">{{ teach_avail.teachers }}</td>
                                     {% else %}
-                                        <td style="background-color:#1a9850"></td>
+                                        <td style="background-color:#1a9850">{{ teach_avail.teachers }}</td>
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
