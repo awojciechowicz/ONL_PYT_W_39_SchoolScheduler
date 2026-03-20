@@ -27,6 +27,21 @@ class TeachersView(View):
         context = {
             'teachers': teachers,
         }
+        for teacher in teachers:
+            num_requirements = Requirements.objects.filter(teacher_subject__teacher=teacher).count()
+            num_availability = TeacherAvailability.objects.filter(teacher=teacher).count()
+            priority = num_availability/num_requirements
+            if priority < 1:
+                teacher.availability_priority = 0
+            elif priority < 2:
+                teacher.availability_priority = 1
+            elif priority < 3:
+                teacher.availability_priority = 2
+            elif priority < 4:
+                teacher.availability_priority = 3
+            else:
+                teacher.availability_priority = 4
+
         return render(
             request,
             'schedule_app/teachers.html',
@@ -73,16 +88,19 @@ class TeacherDetailsView(View):
 class TeachersAvailabilityView(View):
     def get(self, request, *args, **kwargs):
         teachers_availability = TeacherAvailability.objects.all()
+        teachers_all = Teacher.objects.all().count()
         weekdays = Weekday.objects.all()
         time_slots = TimeSlot.objects.all()
         schedule_slots = ScheduleSlot.objects.all().order_by('time_slot', 'weekday')
         teach_avail = []
         for schedule_slot in schedule_slots:
+            teachers_available = teachers_availability.filter(availability=schedule_slot).count()
             teach_avail.append({
                 'weekday': schedule_slot.weekday,
                 'time_slot': schedule_slot.time_slot,
-                'teachers': [teach.teacher
-                             for teach in teachers_availability.filter(availability=schedule_slot)]
+                'teachers': teachers_available / teachers_all * 100,
+                # 'teachers': [teach.teacher
+                #              for teach in teachers_availability.filter(availability=schedule_slot)]
             })
         context = {
             'teachers_availability': teach_avail,

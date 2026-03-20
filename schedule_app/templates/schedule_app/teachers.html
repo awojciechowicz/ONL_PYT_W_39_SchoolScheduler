@@ -5,7 +5,8 @@
     <ol>
         {% for teacher in teachers %}
             <li>
-                <a href="{% url 'teacher' teacher.id %}">{{ teacher }}</a>
+                <a href="{% url 'teacher' teacher.id %}">{{ teacher }} </a>
+                <br>Priority: {{ teacher.availability_priority }}</br>
                 <ul>
                     {% for subject in teacher.subjects.all %}
                         <li>{{ subject }}</li>

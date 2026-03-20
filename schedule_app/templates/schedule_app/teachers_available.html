@@ -17,11 +17,17 @@
                         {% for weekday in weekdays %}
                             {% for teach_avail in teachers_availability %}
                                 {% if teach_avail.weekday == weekday and teach_avail.time_slot == time_slot %}
-                                    <td>
-                                      {% for teacher in teach_avail.teachers%}
-                                          <a href="{% url 'teacher' teacher.id %}">{{ teacher }}</a><br>
-                                      {% endfor %}
-                                    </td>
+                                    {% if teach_avail.teachers == 0 %}
+                                        <td style="background-color:#d73027"></td>
+                                    {% elif teach_avail.teachers <= 15 %}
+                                        <td style="background-color:#fc8d59"></td>
+                                    {% elif teach_avail.teachers <= 30 %}
+                                        <td style="background-color:#fee08b"></td>
+                                    {% elif teach_avail.teachers <= 60 %}
+                                        <td style="background-color:#91cf60"></td>
+                                    {% else %}
+                                        <td style="background-color:#1a9850"></td>
+                                    {% endif %}
                                 {% endif %}
                             {% endfor %}
                         {% endfor %}

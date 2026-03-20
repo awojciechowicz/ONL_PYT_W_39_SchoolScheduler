@@ -39,6 +39,7 @@ class Weekday(models.Model):
 class ScheduleSlot(models.Model):
     weekday = models.ForeignKey(Weekday, on_delete=models.CASCADE)
     time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE)
+    teachers_availability = models.FloatField(blank=True, null=True)
 
 
 class TeacherAvailability(models.Model):
@@ -58,6 +59,7 @@ class Teacher(models.Model):
     )
     available = models.ManyToManyField(ScheduleSlot, blank=True, through='TeacherAvailability')
     subjects = models.ManyToManyField(Subject, blank=True, through='TeacherSubject', related_name='teachers')
+    availability_priority = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.first_name + " " + self.last_name
