@@ -17,7 +17,8 @@ from .models import (Weekday,
                      SchoolClass,
                      Requirements,
                      Lessons,
-                     TeacherSubject)
+                     TeacherSubject,
+                     Probability)
 
 
 # Create your views here.
@@ -101,7 +102,7 @@ class TeachersAvailabilityView(View):
             teach_avail.append({
                 'weekday': schedule_slot.weekday,
                 'time_slot': schedule_slot.time_slot,
-                'teachers': teachers_available / teachers_all * 100,
+                'teachers': int(teachers_available / teachers_all * 100),
                 # 'teachers': [teach.teacher
                 #              for teach in teachers_availability.filter(availability=schedule_slot)]
             })
@@ -839,5 +840,31 @@ class TestView(View):
         return render(
             request,
             'schedule_app/test.html',
+            context
+        )
+
+class ProbabilityView(View):
+    def get(self, request, *args, **kwargs):
+        schedule_slots = ScheduleSlot.objects.all()
+        teachers = Teacher.objects.all()
+        school_classes = SchoolClass.objects.all()
+        probability = []
+        for schedule_slot in schedule_slots:
+            for school_class in school_classes:
+                for teacher in teachers:
+                    probability.append(
+                        {
+                            'weekday': schedule_slot.weekday,
+                            'time_slot': schedule_slot.time_slot,
+                            'school_class': school_class,
+                            'teacher': teacher,
+                        }
+                    )
+        context = {
+            'probability': probability,
+        }
+        return render(
+            request,
+            'schedule_app/probability.html',
             context
         )

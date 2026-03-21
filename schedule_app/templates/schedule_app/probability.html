@@ -1,0 +1,24 @@
+{% extends 'schedule_app/base.html' %}
+{% block content %}
+    <h1>Probability</h1>
+    <table border="2">
+        <tbody>
+            {% for prob in probability %}
+                <tr>
+                    <td style="width: 100px">
+                        {{ prob.weekday }}
+                    </td>
+                    <td style="width: 100px" align="center">
+                        {{ prob.time_slot }}
+                    </td>
+                    <td style="width: 200px">
+                        {{ prob.teacher }}
+                    </td>
+                    <td style="width: 100px" align="center">
+                        {{ prob.school_class }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

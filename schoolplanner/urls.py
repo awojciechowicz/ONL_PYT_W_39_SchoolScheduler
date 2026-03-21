@@ -39,4 +39,5 @@ urlpatterns = [
     path('schedule/school_classes/day/<int:weekday_id>/', sch_views.ScheduleDaySchoolClassView.as_view(), name='day-school-class-schedule'),
     path('schedule/teachers/day/<int:weekday_id>/', sch_views.ScheduleDayTeacherView.as_view(), name='day-teacher-schedule'),
     path('test/', sch_views.TestView.as_view(), name='test'),
+    path('probability/', sch_views.ProbabilityView.as_view(), name='probability'),
 ]

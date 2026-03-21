@@ -92,6 +92,12 @@ class Requirements(models.Model):
     class Meta:
         unique_together = ('school_class', 'teacher_subject')
 
+class Probability(models.Model):
+    schedule_slot = models.ManyToManyField(ScheduleSlot)
+    school_class = models.ManyToManyField(SchoolClass)
+    teacher = models.ManyToManyField(Teacher)
+    lesson_probability = models.FloatField(default=0)
+
 
 class Lessons(models.Model):
     school_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE, default=1)
