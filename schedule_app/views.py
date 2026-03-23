@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 from deap import creator, base, tools, algorithms
+from django.db.models import Sum, TextChoices
 from django.shortcuts import render, redirect
 from django.views import View
 
@@ -33,6 +34,8 @@ class TeachersView(View):
             num_availability = TeacherAvailability.objects.filter(teacher=teacher).count()
             if num_requirements != 0:
                 priority = num_availability/num_requirements
+                teacher.availability_priority = priority
+                teacher.save()
             else:
                 priority = 0
             if priority < 1:
@@ -850,14 +853,53 @@ class ProbabilityView(View):
         school_classes = SchoolClass.objects.all()
         probability = []
         for schedule_slot in schedule_slots:
+            num_teachers = TeacherAvailability.objects.filter(availability=schedule_slot).count()
+            # avail_teachers = []
+            # avail_teachers.append(teach for teach in TeacherAvailability.objects.filter(availability=schedule_slot).all())
+            sum_prio_avail_teachers = TeacherAvailability.objects.filter(
+                availability=schedule_slot
+            ).aggregate(
+                total=Sum('teacher__availability_priority')
+            )['total'] or 0
+            # for teacher in avail_teachers:
+            #     sum_prio_avail_teachers = teacher
             for school_class in school_classes:
                 for teacher in teachers:
+                    num_lessons_this_class = Requirements.objects.\
+                                                 filter(school_class=school_class,teacher_subject__teacher=teacher)\
+                                                 .aggregate(total=Sum('lessons_required'))['total'] or 0
+                    num_lessons_other_classes = Requirements.objects.\
+                                                 filter(teacher_subject__teacher=teacher)\
+                                                 .aggregate(total=Sum('lessons_required'))['total'] or 0 - num_lessons_this_class
+                    num_lessons_total = Requirements.objects. \
+                                                 filter(teacher_subject__teacher=teacher) \
+                                                 .aggregate(total=Sum('lessons_required'))['total'] or 0
+                    num_available_slots = TeacherAvailability.objects.filter(
+                        teacher=teacher
+                    ).count()
+
+                    is_teacher_available = TeacherAvailability.objects.\
+                        filter(teacher=teacher, availability=schedule_slot).exists()
+                    if is_teacher_available:
+                        c1 = num_available_slots / num_lessons_total
+                        c2 = num_lessons_this_class / num_lessons_total
+                        c3 = num_lessons_other_classes / num_lessons_total
+                        percent = round(
+                            100 * c2 / c1 * c3
+                        )
+                    else:
+                        percent = 0
+
                     probability.append(
                         {
                             'weekday': schedule_slot.weekday,
                             'time_slot': schedule_slot.time_slot,
                             'school_class': school_class,
                             'teacher': teacher,
+                            'percent1': num_teachers,
+                            'percent2': school_class,
+                            'percent3': percent,
+                            'percent4': is_teacher_available,
                         }
                     )
         context = {

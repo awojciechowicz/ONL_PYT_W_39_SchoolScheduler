@@ -16,13 +16,13 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Generating subjects"))
         Subject.objects.all().delete()
         subjects = ["Mathematics",
-                    "English Language",
-                    "English Literature",
-                    "Biology",
-                    "Chemistry",
-                    "Physics",
-                    "History",
-                    "Geography",
+                    # "English Language",
+                    # "English Literature",
+                    # "Biology",
+                    # "Chemistry",
+                    # "Physics",
+                    # "History",
+                    # "Geography",
                     # "Computer Science",
                     "Physical Education"]
         for subject in subjects:
@@ -33,10 +33,10 @@ class Command(BaseCommand):
         timeslots = [
             {"start": "8:00", "end": "8:45"},
             {"start": "8:55", "end": "9:40"},
-            {"start": "9:50", "end": "10:35"},
-            {"start": "10:45", "end": "11:30"},
-            {"start": "11:40", "end": "12:25"},
-            {"start": "12:55", "end": "13:40"},
+            # {"start": "9:50", "end": "10:35"},
+            # {"start": "10:45", "end": "11:30"},
+            # {"start": "11:40", "end": "12:25"},
+            # {"start": "12:55", "end": "13:40"},
             # {"start": "13:50", "end": "14:35"},
             # {"start": "14:45", "end": "15:30"},
             # {"start": "15:40", "end": "16:25"},
@@ -49,7 +49,7 @@ class Command(BaseCommand):
             )
         self.stdout.write(self.style.SUCCESS("Generating teachers"))
         Teacher.objects.all().delete()
-        for _ in range(9):
+        for _ in range(2):
             Teacher.objects.create(
                 first_name=fake.first_name(),
                 last_name=fake.last_name(),
@@ -116,7 +116,6 @@ class Command(BaseCommand):
         schoolclasses = [
             "1a",
             "1b",
-            "1c",
         ]
         SchoolClass.objects.all().delete()
         for schoolclass in schoolclasses:
