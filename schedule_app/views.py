@@ -1,14 +1,18 @@
 import random
+from multiprocessing import context
 
 import numpy as np
 from deap import creator, base, tools, algorithms
-from django.db.models import Sum, TextChoices
+from django.contrib.auth.models import User
+from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.views import View
+from django.views.generic import ListView
+from django.contrib.auth import get_user_model, authenticate, login
 
 from .forms import (SubjectCreateForm,
                     SchoolClassCreateForm,
-                    TeacherCreateForm)
+                    TeacherCreateForm, UserLoginForm)
 from .models import (Weekday,
                      TimeSlot,
                      ScheduleSlot,
@@ -19,7 +23,9 @@ from .models import (Weekday,
                      Requirements,
                      Lessons,
                      TeacherSubject,
-                     Probability)
+                     CustomUser)
+
+User = get_user_model()
 
 
 # Create your views here.
@@ -33,7 +39,7 @@ class TeachersView(View):
             num_requirements = Requirements.objects.filter(teacher_subject__teacher=teacher).count()
             num_availability = TeacherAvailability.objects.filter(teacher=teacher).count()
             if num_requirements != 0:
-                priority = num_availability/num_requirements
+                priority = num_availability / num_requirements
                 teacher.availability_priority = priority
                 teacher.save()
             else:
@@ -846,6 +852,7 @@ class TestView(View):
             context
         )
 
+
 class ProbabilityView(View):
     def get(self, request, *args, **kwargs):
         schedule_slots = ScheduleSlot.objects.all()
@@ -865,20 +872,21 @@ class ProbabilityView(View):
             #     sum_prio_avail_teachers = teacher
             for school_class in school_classes:
                 for teacher in teachers:
-                    num_lessons_this_class = Requirements.objects.\
-                                                 filter(school_class=school_class,teacher_subject__teacher=teacher)\
+                    num_lessons_this_class = Requirements.objects. \
+                                                 filter(school_class=school_class, teacher_subject__teacher=teacher) \
                                                  .aggregate(total=Sum('lessons_required'))['total'] or 0
-                    num_lessons_other_classes = Requirements.objects.\
-                                                 filter(teacher_subject__teacher=teacher)\
-                                                 .aggregate(total=Sum('lessons_required'))['total'] or 0 - num_lessons_this_class
+                    num_lessons_other_classes = Requirements.objects. \
+                                                    filter(teacher_subject__teacher=teacher) \
+                                                    .aggregate(total=Sum('lessons_required'))[
+                                                    'total'] or 0 - num_lessons_this_class
                     num_lessons_total = Requirements.objects. \
-                                                 filter(teacher_subject__teacher=teacher) \
-                                                 .aggregate(total=Sum('lessons_required'))['total'] or 0
+                                            filter(teacher_subject__teacher=teacher) \
+                                            .aggregate(total=Sum('lessons_required'))['total'] or 0
                     num_available_slots = TeacherAvailability.objects.filter(
                         teacher=teacher
                     ).count()
 
-                    is_teacher_available = TeacherAvailability.objects.\
+                    is_teacher_available = TeacherAvailability.objects. \
                         filter(teacher=teacher, availability=schedule_slot).exists()
                     if is_teacher_available:
                         c1 = num_available_slots / num_lessons_total
@@ -910,3 +918,36 @@ class ProbabilityView(View):
             'schedule_app/probability.html',
             context
         )
+
+
+class UserListView(ListView):
+    model = CustomUser
+    template_name = 'schedule_app/user_list.html'
+    context_object_name = 'users'
+
+class UserLoginView(View):
+    template_name = 'schedule_app/user_login.html'
+    form_class = UserLoginForm
+    def get(self, request, *args, **kwargs):
+        context = {
+            'form': self.form_class(),
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        context = {
+            'form': form,
+        }
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            if user is None:
+                form.add_error(None, 'Login failed')
+                return render(request, self.template_name, context)
+            else:
+                login(request, user)
+                return redirect('teachers')
+        else:
+            return render(request, self.template_name, context)

@@ -15,3 +15,7 @@ class TeacherCreateForm(forms.Form):
     last_name = forms.CharField(max_length=64)
     email = forms.EmailField()
     subjects = forms.ModelMultipleChoiceField(queryset=Subject.objects.all(), widget=forms.CheckboxSelectMultiple)
+
+class UserLoginForm(forms.Form):
+    username = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput)

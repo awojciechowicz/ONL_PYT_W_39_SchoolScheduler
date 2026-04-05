@@ -40,4 +40,6 @@ urlpatterns = [
     path('schedule/teachers/day/<int:weekday_id>/', sch_views.ScheduleDayTeacherView.as_view(), name='day-teacher-schedule'),
     path('test/', sch_views.TestView.as_view(), name='test'),
     path('probability/', sch_views.ProbabilityView.as_view(), name='probability'),
+    path('users/', sch_views.UserListView.as_view(), name='users'),
+    path('login/', sch_views.UserLoginView.as_view(), name='user-login'),
 ]
